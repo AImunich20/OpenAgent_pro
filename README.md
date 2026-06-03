@@ -1,4 +1,3 @@
-id="48271"}
 # OpenJarvis + Ollama + Python Tools Setup (Ubuntu Server)
 
 Complete setup guide for running OpenJarvis with Ollama on Ubuntu/Linux.
