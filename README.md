@@ -1,178 +1,566 @@
-ent" id="48271"}
+"53824"}
 # OpenJarvis + Ollama + Python Tools Setup (Ubuntu Server)
 
-## 1) Update system
-bash sudo apt update && sudo apt upgrade -y 
+Complete setup guide for running OpenJarvis with Ollama on Ubuntu/Linux.
 
 ---
 
-## 2) Install required packages
-bash sudo apt install -y \ git \ curl \ ffmpeg \ python3 \ python3-pip \ python3-venv \ build-essential 
+## 1. Update System
 
-จุดพังบ่อย:
-- ffmpeg ไม่มี → voice/audio ใช้ไม่ได้
-- build-essential ไม่มี → บาง package compile ไม่ผ่าน
-
----
-
-## 3) Install uv
-bash curl -LsSf https://astral.sh/uv/install.sh | sh 
-
-โหลด path ใหม่
-bash source ~/.bashrc 
-
-เช็ค
-bash uv --version 
-
-ถ้า command not found:
-bash export PATH="$HOME/.local/bin:$PATH" source ~/.bashrc 
+```bash
+sudo apt update && sudo apt upgrade -y
+```
 
 ---
 
-## 4) Clone/Open project
-bash cd ~/Desktop/Project_sasta 
+## 2. Install Required Packages
 
-ถ้ายังไม่มี:
-bash git clone <https://github.com/open-jarvis/OpenJarvis.git> 
+```bash
+sudo apt install -y \
+    git \
+    curl \
+    ffmpeg \
+    python3 \
+    python3-pip \
+    python3-venv \
+    build-essential
+```
 
-เข้าโปรเจกต์
-bash cd OpenJarvis 
+### Common Issues
+
+- `ffmpeg` missing → audio/voice features may fail
+- `build-essential` missing → some Python packages cannot compile
 
 ---
 
-## 5) Install python environment
+## 3. Install uv
+
+Install uv package manager:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Reload shell:
+
+```bash
+source ~/.bashrc
+```
+
+Check installation:
+
+```bash
+uv --version
+```
+
+If `uv: command not found`:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+source ~/.bashrc
+```
+
+---
+
+## 4. Clone OpenJarvis
+
+```bash
+cd ~/Desktop/Project_sasta
+```
+
+Clone repository:
+
+```bash
+git clone https://github.com/open-jarvis/OpenJarvis.git
+```
+
+Enter project directory:
+
+```bash
+cd OpenJarvis
+```
+
+---
+
+## 5. Install Python Environment
+
+```bash
+uv sync
+```
+
+Check Python version:
+
+```bash
+python3 --version
+```
+
+Recommended: **Python 3.10+**
+
+---
+
+## 6. Activate Virtual Environment
+
+```bash
+source .venv/bin/activate
+```
+
+Verify Python path:
+
+```bash
+which python
+```
+
+Expected output:
+
+```bash
+.../OpenJarvis/.venv/bin/python
+```
+
+---
+
+## 7. Test OpenJarvis Import
+
+```bash
+python -c "import openjarvis; print('OPENJARVIS OK')"
+```
+
+If import fails:
+
+```bash
+uv sync --reinstall
+```
+
+---
+
+## 8. Check CLI
+
+```bash
+python -m openjarvis.cli --help
+```
+
+---
+
+## 9. Initialize Config
+
+```bash
+python -m openjarvis.cli init
+```
+
+---
+
+# OLLAMA SETUP
+
+## 10. Install Ollama
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+Verify installation:
+
+```bash
+ollama --version
+```
+
+---
+
+## 11. Start Ollama Service
+
+Enable auto-start:
+
+```bash
+sudo systemctl enable ollama
+```
+
+Start service:
+
+```bash
+sudo systemctl start ollama
+```
+
+Check status:
+
+```bash
+systemctl status ollama
+```
+
+---
+
+## 12. Download Models
+
+### Llama 3
+
+```bash
+ollama pull llama3
+```
+
+### Gemma 3 (4B)
+
+```bash
+ollama pull gemma3:4b
+```
+
+List installed models:
+
+```bash
+ollama list
+```
+
+---
+
+# CONNECT OPENJARVIS
+
+## 13. Test OpenJarvis
+
+```bash
+python -m openjarvis.cli ask "hello"
+```
+
+If timeout occurs:
+
+```bash
+ollama serve
+```
+
+Then retry.
+
+---
+
+## 14. Configure Model
+
+```bash
+python -m openjarvis.cli config
+```
+
+Example model names:
+
+```bash
+llama3
+```
+
+or
+
+```bash
+gemma3:4b
+```
+
+---
+
+# EXTRA PYTHON TOOLS
+
+## 15. Ensure pip Exists
+
+```bash
+./.venv/bin/python -m ensurepip
+```
+
+---
+
+## 16. Install requests
+
+```bash
+python -m pip install requests
+```
+
+---
+
+## 17. Install Extra Server Dependencies
+
+```bash
+uv sync --extra server
+```
+
+---
+
+# TEST EVERYTHING
+
+## 18. Test Ollama Directly
+
+```bash
+ollama run llama3
+```
+
+or
+
+```bash
+ollama run gemma3:4b
+```
+
+---
+
+## 19. Final Test
+
+```bash
+python -m openjarvis.cli ask "What time is it?"
+```
+
+---
+
+# USEFUL COMMANDS
+
+## Activate venv
+
+```bash
+source .venv/bin/activate
+```
+
+## Exit venv
+
+```bash
+deactivate
+```
+
+## Update dependencies
+
+```bash
+uv sync
+```
+
+## Rebuild virtual environment
+
+```bash
+rm -rf .venv
+uv sync
+```
+
+---
+
+# COMMON ERRORS
+
+## uv: command not found
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+source ~/.bashrc
+```
+
+---
+
+## No module named openjarvis
+
+```bash
+source .venv/bin/activate
+uv sync
+```
+
+---
+
+## Connection refused localhost:11434
+
+```bash
+ollama serve
+```
+
+---
+
+## Model not found
+
+```bash
+ollama list
+```
+
+---
+
+## RAM Not Enough
+
+Use smaller model:
+
+```bash
+gemma3:4b
+```
+
+---
+
+## Disk Full
+
+Check disk usage:
+
+```bash
+df -h
+```
+
+Remove unused models:
+
+```bash
+ollama rm <MODEL_NAME>
+```
+
+---
+
+# OPTIONAL
+
+## Auto-start Ollama on Boot
+
+```bash
+sudo systemctl enable oll
 bash uv sync 
 
-จุดพังบ่อย:
-- internet timeout
-- package compile fail
-- python version ต่ำเกิน
+## Common Issues
 
-เช็ค python:
+- Internet timeout
+- Package compile failure
+- Python version too old
+
+Check Python version:
+
 bash python3 --version 
 
-ควรเป็น 3.10+
+Recommended: Python 3.10+
 
 ---
 
-## 6) Activate venv
+# 6. Activate Virtual Environment
+
 bash source .venv/bin/activate 
 
-เช็ค:
+Verify Python path:
+
 bash which python 
 
-ต้องขึ้นประมาณ:
+Expected output:
+
 bash .../OpenJarvis/.venv/bin/python 
 
 ---
 
-## 7) Test OpenJarvis import
+# 7. Test OpenJarvis Import
+
 bash python -c "import openjarvis; print('OPENJARVIS OK')" 
 
-ถ้าพัง:
+If import fails:
+
 bash uv sync --reinstall 
 
 ---
 
-## 8) Check CLI
+# 8. Check CLI
+
 bash python -m openjarvis.cli --help 
 
 ---
 
-## 9) Initialize config
+# 9. Initialize Config
+
 bash python -m openjarvis.cli init 
 
 ---
 
-# OLLAMA
+# OLLAMA SETUP
 
-## 10) Install Ollama
+# 10. Install Ollama
+
 bash curl -fsSL https://ollama.com/install.sh | sh 
 
-เช็ค:
+Verify installation:
+
 bash ollama --version 
 
 ---
 
-## 11) Start ollama service
-bash sudo systemctl enable ollama sudo systemctl start ollama 
+# 11. Start Ollama Service
 
-เช็ค:
+Enable auto-start:
+
+bash sudo systemctl enable ollama 
+
+Start service:
+
+bash sudo systemctl start ollama 
+
+Check status:
+
 bash systemctl status ollama 
 
 ---
 
-## 12) Pull model
+# 12. Download Models
 
-Llama:
+## Llama 3
+
 bash ollama pull llama3 
 
-Gemma:
+## Gemma 3 (4B)
+
 bash ollama pull gemma3:4b 
 
-จุดพังบ่อย:
-- disk เต็ม
-- RAM ไม่พอ
-- model ใหญ่เกินเครื่อง
+## Common Issues
 
-เช็ค model:
+- Disk full
+- Not enough RAM
+- Model too large for hardware
+
+List installed models:
+
 bash ollama list 
 
 ---
 
 # CONNECT OPENJARVIS
 
-## 13) Test ask
+# 13. Test OpenJarvis
+
 bash python -m openjarvis.cli ask "hello" 
 
-ถ้า timeout:
+If timeout occurs:
+
 bash ollama serve 
 
-แล้วลองใหม่
+Then retry.
 
 ---
 
-## 14) Config
+# 14. Configure Model
+
 bash python -m openjarvis.cli config 
 
-ตั้ง model ให้ตรงกับ:
+Set model name to match:
+
 bash ollama list 
 
-เช่น:
+Example:
+
 bash llama3 
-หรือ
+
+or
+
 bash gemma3:4b 
 
 ---
 
 # EXTRA PYTHON TOOLS
 
-## 15) Ensure pip
+# 15. Ensure pip Exists
+
 bash ./.venv/bin/python -m ensurepip 
 
 ---
 
-## 16) Install requests
+# 16. Install requests
+
 bash python -m pip install requests 
 
 ---
 
-## 17) Install extra server dependencies
+# 17. Install Extra Server Dependencies
+
 bash uv sync --extra server 
 
 ---
 
 # TEST EVERYTHING
 
-## 18) Test ollama
+# 18. Test Ollama Directly
+
 bash ollama run llama3 
 
-หรือ
+or
+
 bash ollama run gemma3:4b 
 
 ---
 
-## 19) Final test
+# 19. Final Test
+
 bash python -m openjarvis.cli ask "What time is it?" 
 
 ---
@@ -180,67 +568,98 @@ bash python -m openjarvis.cli ask "What time is it?"
 # USEFUL COMMANDS
 
 ## Activate venv
+
 bash source .venv/bin/activate 
 
 ## Exit venv
+
 bash deactivate 
 
 ## Update dependencies
+
 bash uv sync 
 
-## Rebuild venv
+## Rebuild virtual environment
+
 bash rm -rf .venv uv sync 
 
 ---
 
 # COMMON ERRORS
 
-## "uv: command not found"
+## uv: command not found
+
 bash export PATH="$HOME/.local/bin:$PATH" source ~/.bashrc 
 
 ---
 
-## "No module named openjarvis"
+## No module named openjarvis
+
 bash source .venv/bin/activate uv sync 
 
 ---
 
-## "Connection refused localhost:11434"
-Ollama ยังไม่รัน:
+## Connection refused localhost:11434
+
+Ollama is not running:
+
 bash ollama serve 
 
 ---
 
 ## Model not found
-เช็ค:
+
+Check installed models:
+
 bash ollama list 
 
-แล้วใช้ชื่อ model ให้ตรง
+Use the exact model name shown.
 
 ---
 
-## RAM ไม่พอ
-ใช้:
+## RAM Not Enough
+
+Use a smaller model:
+
 bash gemma3:4b 
 
-แทน model ใหญ่
+instead of larger models.
 
 ---
 
-## Disk เต็ม
-เช็ค:
+## Disk Full
+
+Check disk usage:
+
 bash df -h 
 
-ลบ model:
+Remove unused models:
+
 bash ollama rm <MODEL_NAME> 
 
 ---
 
 # OPTIONAL
 
-## Auto-start ollama
+## Auto-start Ollama on Boot
+
 bash sudo systemctl enable ollama 
 
 ---
 
-## Run O
+# Recommended Hardware
+
+| Component | Recommended |
+|---|---|
+| RAM | 16GB+ |
+| CPU | 4+ cores |
+| Storage | SSD |
+| GPU | Optional |
+
+---
+
+# Notes
+
+- Running large models may require significant RAM.
+- SSD storage greatly improves model loading speed.
+- Use smaller models on low-power systems such as Raspberry Pi or
